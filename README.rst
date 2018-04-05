@@ -60,6 +60,7 @@ Now calling our function might look like this:
 
     >>> my_func(a=3, b=7, jk=True)
     LOL! Then why are you asking me to run 'my_func'? Unbelievable!
+    21
 
 And the day is saved.
 
