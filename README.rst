@@ -11,7 +11,7 @@ Using snarky is really easy. Suppose we have a function:
 
 .. code-block:: python
 
-    def my_fun(a, b):
+    def my_func(a, b):
         """Sample function with arguments."""
         return a*b
 
@@ -44,7 +44,7 @@ Simply add one of several default behaviors, or even define your own! Here, we w
     from snarky import *
 
     @snarky
-    def my_fun(a, b):
+    def my_func(a, b):
         """Sample function with arguments."""
         return a*b
 
