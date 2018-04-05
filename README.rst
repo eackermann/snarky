@@ -2,7 +2,7 @@
 Snarky
 ======
 
-Snarky is a useless package that makes it easy to add a jk (just kidding!) keyword argument to any function. Moreover, snarky defines several default behaviors for reacting whenever jk==True.
+Snarky is a useless Python package that makes it easy to add a ``jk`` (just kidding!) keyword argument to any function. Moreover, snarky defines several default behaviors for reacting whenever jk==True.
 
 Quick examples
 ==============
@@ -40,6 +40,8 @@ That's where ``snarky`` shines!
 Simply add one of several default behaviors, or even define your own! Here, we will apply the default snarky behavior to our function:
 
 .. code-block:: python
+
+    from snarky import *
 
     @snarky
     def my_fun(a, b):

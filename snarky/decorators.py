@@ -4,39 +4,18 @@ Decorators define behaviors that are involed when jk==True.
 
 import time # TODO: don't need to load it if not necessary... let user only load specifics
 
-__all__ = ['test',
-           'snarky',
+__all__ = ['snarky',
            'snarkyvoice',
            'say_time']
 
-def test(fun):
-    """"""
-    def wrapper(*args, **kwargs):
-        jk = kwargs.pop('jk', None)
-
-        # before function call:
-        if jk:
-            text = "Shay, Shayok, or Shayoghurt. It's all the same to me..."
-            print(text)
-
-        # function call:
-        out = fun(*args, **kwargs)
-
-        # after function call:
-        if jk:
-            text = "Just kidding..."
-            print(text)
-        return out
-    return wrapper
-
 def snarky(fun):
-    """"""
+    """Snarky text reaction when using the jk=True keyword argument."""
     def wrapper(*args, **kwargs):
         jk = kwargs.pop('jk', None)
 
         # before function call:
         if jk:
-            text = "Shay, Shayok, or Shayoghurt. It's all the same to me..."
+            text = "LOL! Then why are you asking me to run '" + fun.__name__ + "'? Unbelievable!"
             print(text)
 
         # function call:
@@ -44,14 +23,14 @@ def snarky(fun):
 
         # after function call:
         if jk:
-            text = "Just kidding..."
-            print(text)
+            pass
+
         return out
 
     return wrapper
 
 def snarkyvoice(fun):
-    """"""
+    """Snarky text-to-speech reaction when using the jk=True keyword argument."""
     from google_speech import Speech
     lang = "en"
     def wrapper(*args, **kwargs):
@@ -59,7 +38,7 @@ def snarkyvoice(fun):
 
         # before function call:
         if jk:
-            text = "Shay, Shayok, or Shayoghurt. It's all the same to me..."
+            text = "LOL! Then why are you asking me to run '" + fun.__name__ + "'? Unbelievable!"
             speech = Speech(text, lang)
             speech.play(None)
 
@@ -68,10 +47,10 @@ def snarkyvoice(fun):
 
         # after function call:
         if jk:
-            text = "Just kidding..."
-            speech = Speech(text, lang)
-            speech.play(None)
+            pass
+
         return out
+
 #             # you can also apply audio effects (using SoX)
 #             # see http://sox.sourceforge.net/sox.html#EFFECTS for full effect documentation
 #             sox_effects = ("speed", "1.5")
