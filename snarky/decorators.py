@@ -1,10 +1,12 @@
 """Snarky behavioral decorators.
 Decorators define behaviors that are involed when jk==True.
 """
-import time # TODO: don't need to load it if not necessary... let user only load specifics
+from functools import wraps
+from random import randint
 
 from . import messages
-from random import randint
+
+import time # TODO: don't need to load it if not necessary... let user only load specifics
 
 __all__ = ['snarky',
            'snarkyvoice',
@@ -27,58 +29,93 @@ __all__ = ['snarky',
 # def foo(*args, **kwargs):
 #     pass
 
-def snarky(fun):
+def snarky(*args, run_anyway=False):
     """Snarky text reaction when using the jk=True keyword argument."""
-    runanyway = False
-    def wrapper(*args, **kwargs):
-        jk = kwargs.pop('jk', None)
+    no_args = False
+    assert len(args) <2, "'run_anyway' is the only argument allowed!"
+    if len(args) == 1 and not run_anyway and callable(args[0]):
+        # We were called without args
+        no_args = True
+        fun = args[0]
 
-        # before function call:
-        if jk:
-            text = "LOL! Then why are you asking me to run '" + fun.__name__ + "'? Unbelievable!"
-            print(text)
+    def outer(fun):
+        @wraps(fun)
+        def inner(*args, **kwargs):
+            jk = kwargs.pop('jk', None)
+            # before function call:
+            if jk:
+                text = "LOL! Then why are you asking me to run '" + fun.__name__ + "'? Unbelievable!"
+                print(text)
 
-        # function call:
-        if runanyway:
-            out = fun(*args, **kwargs)
-        else:
-            out = None
-        # after function call:
-        if jk:
-            message_idx = randint(0, len(messages.default)-1)
-            text = messages.default[message_idx]
-            print(text)
-        return out
+            # function call:
+            if run_anyway or not jk:
+                out = fun(*args, **kwargs)
+            else:
+                out = None
 
-    return wrapper
+            # after function call:
+            if jk:
+                message_idx = randint(0, len(messages.default)-1)
+                text = messages.default[message_idx]
+                print(text)
+            return out
+        return inner
 
-def snarkyvoice(fun):
-    """Snarky text-to-speech reaction when using the jk=True keyword argument."""
+    if no_args:
+        return outer(fun)
+    else:
+        return outer
+
+def snarkyvoice(*args, lang='en', sox=None, run_anyway=False):
+    """Snarky text-to-speech reaction when using the jk=True keyword argument.
+
+        # you can also apply audio effects (using SoX)
+        # see http://sox.sourceforge.net/sox.html#EFFECTS for full effect documentation
+        sox_effects = ("speed", "1.5")
+        speech.play(sox_effects)
+    """
+
     from google_speech import Speech
-    lang = "en"
-    def wrapper(*args, **kwargs):
-        jk = kwargs.pop('jk', None)
 
-        # before function call:
-        if jk:
-            text = "LOL! Then why are you asking me to run '" + fun.__name__ + "'? Unbelievable!"
-            speech = Speech(text, lang)
-            speech.play(None)
+    if sox:
+        raise NotImplementedError('SoX support has not been implemented yet...')
 
-         # function call:
-        out = fun(*args, **kwargs)
+    no_args = False
+    assert len(args) <2, "no positional arguments are supported!"
+    if len(args) == 1 and not run_anyway and callable(args[0]):
+        # We were called without args
+        no_args = True
+        fun = args[0]
 
-        # after function call:
-        if jk:
-            pass
+    def outer(fun):
+        @wraps(fun)
+        def inner(*args, **kwargs):
+            jk = kwargs.pop('jk', None)
+            # before function call:
+            if jk:
+                text = "LOL! Then why are you asking me to run '" + fun.__name__ + "'? Unbelievable!"
+                speech = Speech(text, lang)
+                speech.play(None)
 
-        return out
+            # function call:
+            if run_anyway or not jk:
+                out = fun(*args, **kwargs)
+            else:
+                out = None
 
-#             # you can also apply audio effects (using SoX)
-#             # see http://sox.sourceforge.net/sox.html#EFFECTS for full effect documentation
-#             sox_effects = ("speed", "1.5")
-#             speech.play(sox_effects)
-    return wrapper
+            # after function call:
+            if jk:
+                message_idx = randint(0, len(messages.default)-1)
+                text = messages.default[message_idx]
+                speech = Speech(text, lang)
+                speech.play(None)
+            return out
+        return inner
+
+    if no_args:
+        return outer(fun)
+    else:
+        return outer
 
 def say_time(fun):
     """
