@@ -76,3 +76,61 @@ def say_time(fun):
         speech.play(None)
         return out
     return wrapper
+
+def custom_response(*, before=None, after=None):
+    """Build a custom response decorator.
+
+    Params
+    ======
+    before: callable, optional
+        A callable function which will be executed before entering the calling
+        function. Default does nothing.
+    after: callable, optional
+        A callable function which will be executed after leaving the calling
+        function. Default does nothing.
+
+    Returns
+    =======
+    decorator: function
+        A decorator function implementing the custom before and after actions.
+
+    Example
+    =======
+
+    >>> def after():
+    >>>     print('I regret doing that...')
+
+    >>> my_response = snarky.decorators.custom_response(after=after)
+
+    >>> @my_response
+    >>> def my_fun(a,b):
+    >>>    return a*b
+    """
+
+    def do_nothing():
+        pass
+
+    if not before:
+        before = do_nothing
+
+    if not after:
+        after = do_nothing
+
+    def decorator(fun):
+        """Snarky text reaction when using the jk=True keyword argument."""
+        def wrapper(*args, **kwargs):
+            jk = kwargs.pop('jk', None)
+
+            # before function call:
+            if jk:
+                before()
+
+            # function call:
+            out = fun(*args, **kwargs)
+
+            # after function call:
+            if jk:
+                after()
+            return out
+        return wrapper
+    return decorator
