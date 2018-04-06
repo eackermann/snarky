@@ -1,15 +1,35 @@
 """Snarky behavioral decorators.
 Decorators define behaviors that are involed when jk==True.
 """
-
 import time # TODO: don't need to load it if not necessary... let user only load specifics
+
+from . import messages
+from random import randint
 
 __all__ = ['snarky',
            'snarkyvoice',
            'say_time']
 
+# See https://stackoverflow.com/questions/5929107/decorators-with-parameters; still confused?
+# See https://www.pydanny.com/python-partials-are-fun.html
+# from functools import partial
+
+# def _pseudo_decor(fun, argument):
+#     def ret_fun(*args, **kwargs):
+#         #do stuff here, for eg.
+#         print ("decorator arg is %s" % str(argument))
+#         return fun(*args, **kwargs)
+#     return ret_fun
+
+# real_decorator = partial(_pseudo_decor, argument=arg)
+
+# @real_decorator
+# def foo(*args, **kwargs):
+#     pass
+
 def snarky(fun):
     """Snarky text reaction when using the jk=True keyword argument."""
+    runanyway = False
     def wrapper(*args, **kwargs):
         jk = kwargs.pop('jk', None)
 
@@ -19,12 +39,15 @@ def snarky(fun):
             print(text)
 
         # function call:
-        out = fun(*args, **kwargs)
-
+        if runanyway:
+            out = fun(*args, **kwargs)
+        else:
+            out = None
         # after function call:
         if jk:
-            pass
-
+            message_idx = randint(0, len(messages.default)-1)
+            text = messages.default[message_idx]
+            print(text)
         return out
 
     return wrapper
